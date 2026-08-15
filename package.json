@@ -1,0 +1,30 @@
+{
+  "name": "dsh-computer-use",
+  "version": "0.1.0",
+  "description": "Computer Use 插件：虚拟鼠标真人操作（screen_observe + computer_click 等 11 个模型友好工具，跨平台 cua-driver 引擎）",
+  "type": "module",
+  "main": "index.js",
+  "license": "MIT",
+  "keywords": ["dsh", "computer-use", "cua-driver", "harness-desktop", "autopilot"],
+  "dsh": {
+    "bundle": {
+      "patch": "cordis.patch.yml"
+    }
+  },
+  "files": [
+    "index.js",
+    "lib/",
+    "tools/",
+    "cordis.patch.yml",
+    "README.md",
+    "VERIFICATION.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "check": "node --check index.js && node --check lib/*.js && bash -n install.sh && bash -n uninstall.sh"
+  },
+  "dependencies": {
+    "@deepseek-ai/dsh-tools": "^0.1.0-rc.6",
+    "@deepseek-ai/schemastery": "^3.0.0"
+  }
+}

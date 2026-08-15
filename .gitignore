@@ -1,0 +1,14 @@
+# 隔离测试环境（不入库）
+.dsh-p0/
+.dsh-test/
+
+# 依赖链接（指向本机 harness 的 node_modules，符号链接）
+node_modules
+
+# 环境/密钥
+.env
+.zhipu-key
+*.key
+
+# 系统
+.DS_Store
