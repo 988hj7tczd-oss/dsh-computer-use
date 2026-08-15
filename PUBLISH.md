@@ -62,11 +62,11 @@ awesome 列表（2229⭐，dsh 官方精选）收录规则（2026-08-15 实测�
    放哪个分类？候选：`Tools & Capabilities` / `Development & Runtime` / 新增 `Computer Use` 分类
 3. 提交 PR，等合并
 
-## ⏳ 待做：独立站引流（aibunkhouse.com）
+## ✅ 已完成：独立站引流（aibunkhouse.com）（2026-08-15）
 
-- [ ] 博客发一篇 dsh-computer-use 介绍文章（教程资源分类）
-- [ ] 工具页/资源页挂仓库链接
-- [ ] README 挂 aibunkhouse.com（引流闭环）
+^- [x] 博客发一篇 dsh-computer-use 介绍文章（教程资源分类，ID 279，2212字）
+^- [x] 工具页挂仓库链接（tools 表 + API 第5条 + featured）
+^- [ ] README 挂 aibunkhouse.com（引流闭环）（待做：README 加独立站链接）
 
 ## Release 发布（可选）
 
