@@ -112,3 +112,4 @@ MIT
 - npm：https://www.npmjs.com/package/dsh-computer-use
 - AI House 独立站（AI 工具排行榜）：https://www.aibunkhouse.com/
 - harness-desktop（DeepSeek Harness 桌面端）：https://github.com/988hj7tczd-oss/harness-desktop
+- awesome-dsh-plugin（DeepSeek Harness 插件精选列表）：https://github.com/988hj7tczd-oss/awesome-dsh-plugin
