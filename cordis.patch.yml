@@ -8,3 +8,4 @@
       config:
         ttlMs: 15000
         maxElements: 500
+        visionMaxTokens: 32768

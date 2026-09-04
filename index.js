@@ -56,6 +56,8 @@ export const Config = z.object({
   visionProvider: z.string().default('deepseek-official'),
   /** Mode D 观察者模型（需声明 image 输入）。 */
   visionModel: z.string().default('deepseek-v4-flash-vision-exp'),
+  /** Mode D 单次观察的总生成预算（含 reasoning），范围 1–32768。 */
+  visionMaxTokens: z.number().min(1).max(32768).default(32768),
 })
 
 /** 统一输出 schema：ok + result 文本。 */
@@ -132,6 +134,7 @@ export function apply(ctx, config) {
     nativeImage: config.nativeImage || 'auto',
     visionProvider: config.visionProvider || 'deepseek-official',
     visionModel: config.visionModel || 'deepseek-v4-flash-vision-exp',
+    visionMaxTokens: Math.min(32768, Math.max(1, Math.floor(Number(config.visionMaxTokens) || 32768))),
   }
 
   // 初始化虚拟光标：声明统一会话 + 应用主题（异步，不阻塞插件加载）

@@ -45,6 +45,7 @@ else
       printf '      config:\n'
       printf '        ttlMs: 15000\n'
       printf '        maxElements: 500\n'
+      printf '        visionMaxTokens: 32768\n'
     } >> "$PATCH"
     echo "  [ok] 已写入 $PATCH"
   fi

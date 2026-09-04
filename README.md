@@ -311,6 +311,7 @@ computer_click(x=640, y=420)
     nativeImage: auto
     visionProvider: deepseek-official
     visionModel: deepseek-v4-flash-vision-exp
+    visionMaxTokens: 32768
 ```
 
 | 配置项 | 默认值 | 说明 |
@@ -322,6 +323,7 @@ computer_click(x=640, y=420)
 | `nativeImage` | `auto` | `auto` 自动降级；`full` 原图；`compact` 始终使用小图 |
 | `visionProvider` | `deepseek-official` | `vision` 模式使用的 provider |
 | `visionModel` | `deepseek-v4-flash-vision-exp` | `vision` 模式使用的视觉模型 |
+| `visionMaxTokens` | `32768` | 视觉观察者单次生成总预算（含 reasoning），范围 `1`–`32768`；思考型模型建议保留较高值 |
 
 > 安装脚本或 bundle patch 可能覆盖代码层默认值。请以实际生成的 `$DSH_HOME/cordis.patch.yml` 为准；多步任务建议显式写入 `ttlMs`，不要依赖隐式默认值。
 
@@ -551,6 +553,7 @@ Semantic checks are strongest for `element`-based actions. Coordinate actions an
     nativeImage: auto
     visionProvider: deepseek-official
     visionModel: deepseek-v4-flash-vision-exp
+    visionMaxTokens: 32768
 ```
 
 | Option | Default | Description |
@@ -562,6 +565,7 @@ Semantic checks are strongest for `element`-based actions. Coordinate actions an
 | `nativeImage` | `auto` | `auto`, `full`, or `compact` screenshot strategy |
 | `visionProvider` | `deepseek-official` | Provider used by `vision` mode |
 | `visionModel` | `deepseek-v4-flash-vision-exp` | Image-capable observer model |
+| `visionMaxTokens` | `32768` | Total observer generation budget, including reasoning; range `1`–`32768` |
 
 If an installer or bundle patch overrides the code-level default, the generated `$DSH_HOME/cordis.patch.yml` is authoritative. For multi-step tasks, set `ttlMs` explicitly instead of relying on an implicit default.
 
