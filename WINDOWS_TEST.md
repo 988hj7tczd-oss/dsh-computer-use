@@ -1,5 +1,8 @@
 # Windows 双平台冒烟验证指南
 
+> **当前状态：BLOCKED — no Windows GUI test environment available。**
+> 以下是获得 Windows 10/11 测试环境后的验收步骤；逻辑和路径测试不能替代真实 GUI 验收。
+
 > 目标：验证 dsh-computer-use 在 Windows 上完成"打开应用 → 点击 → 输入"闭环。
 > 无 Windows 真机时，可用 cua-driver 官方的 "Drive a Windows app over SSH" 方案远程驱动。
 

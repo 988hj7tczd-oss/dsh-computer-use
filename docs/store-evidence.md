@@ -34,7 +34,7 @@ rm -rf "$DSH_HOME"
 | 入口可加载 | `node -e "import('./index.js')"` | 成功（导出 name/inject/apply） |
 | 工具注册面 | grep index.js `defineTool` | **12 个工具**：screen_observe / screen_zoom / computer_click / computer_double_click / computer_right_click / computer_type / computer_key / computer_scroll / computer_drag / computer_wait / app_list / app_launch |
 | 安全护栏 | index.js `guard()` 统一包装 | 危险词审批、密码框保护、过期状态拒绝、作用域权限 |
-| 权限面 | `PERMISSIONS.md` | spawn cua-driver（非 shell 固定 argv）；无网络 / 凭据 / 文件读写 / 生命周期脚本 |
+| 权限面 | `PERMISSIONS.md` | spawn cua-driver（非 shell 固定 argv）；核心路径无业务文件读写；仅用户显式配置 GLM fallback 时读取指定 key 来源并向 Z.AI GLM API 发 HTTPS 请求；无 npm 生命周期脚本 |
 | npm 包 | `npm pack` 内容核验 | files: index.js / lib/ / tools/ / cordis.patch.yml / README / VERIFICATION / PERMISSIONS.md / docs/ / LICENSE |
 
 ## 3. STORE 五信号响应行
@@ -44,7 +44,7 @@ rm -rf "$DSH_HOME"
 | 规范仓库（canonical repository） | package.json `repository` → `git+https://github.com/988hj7tczd-oss/dsh-computer-use.git`（与仓库一致） |
 | Node 兼容性声明 | `engines.node >= 22.18.0` + `dsh.compatibility.node` |
 | 供应链审查 | 依赖仅 `@deepseek-ai/dsh-tools` + `@deepseek-ai/schemastery`（官方生态）；无 runtime/optional 第三方依赖；peer 层面无 |
-| 文件权限信号 | 有 `spawn` 子进程（cua-driver）——真实插件核心能力，非数据访问；无 fs 读写 |
+| 文件权限信号 | 有 `spawn` 子进程（cua-driver）——真实插件核心能力；GLM fallback 仅读取用户显式指定的 key 文件，不写文件 |
 | 命令权限信号 | `spawn` 固定 argv、`shell: false`、无 `exec`/`eval`/`shell: true` |
 
 ## 4. 验证脚本
