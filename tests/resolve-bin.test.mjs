@@ -35,3 +35,15 @@ test('resolveBin finds the official Windows installer layout', () => {
   })
   assert.equal(result, official)
 })
+
+test('resolveBin keeps the official installer path ahead of legacy locations', () => {
+  const official = 'C:\\Users\\tester\\.cua-driver\\packages\\current\\cua-driver.exe'
+  const legacy = 'C:\\Users\\tester\\.local\\bin\\cua-driver.exe'
+  const result = resolveBin({
+    platform: 'win32',
+    env: { PATH: '' },
+    home: 'C:\\Users\\tester',
+    exists: (path) => path === official || path === legacy,
+  })
+  assert.equal(result, official)
+})
