@@ -1,6 +1,6 @@
 {
   "name": "dsh-computer-use",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Computer Use 插件：虚拟鼠标真人操作 + 原生视觉模型接入（deepseek-v4-flash-vision-exp 直读截图），screen_observe 等 12 个模型友好工具",
   "type": "module",
   "main": "index.js",
@@ -18,7 +18,7 @@
     },
     "compatibility": {
       "node": ">=22.18.0",
-      "dsh": ">=0.1.0"
+      "dsh": ">=0.1.2-rc.1"
     },
     "permissions": {
       "summary": "通过宿主 spawn 以非 shell 固定 argv 调用 cua-driver 原生驱动本地桌面：屏幕观测（screen_observe/screen_zoom，AX 树+窗口快照）、虚拟鼠标键盘模拟（computer_click/type/key/scroll/drag/wait）、应用枚举与启动（app_list/app_launch）。内置安全护栏：危险词审批、密码框保护、过期状态拒绝、作用域权限；虚拟光标不抢占真实鼠标。无文件读写、无网络、无凭据访问。",
@@ -45,10 +45,11 @@
     "verify-runtime.mjs"
   ],
   "scripts": {
+    "test": "node --test tests/*.test.mjs",
     "check": "node --check index.js && node --check lib/*.js && bash -n install.sh && bash -n uninstall.sh"
   },
   "dependencies": {
-    "@deepseek-ai/dsh-tools": "0.1.1-rc.2",
+    "@deepseek-ai/dsh-tools": "0.1.2-rc.1",
     "@deepseek-ai/schemastery": "^3.0.0"
   },
   "repository": {

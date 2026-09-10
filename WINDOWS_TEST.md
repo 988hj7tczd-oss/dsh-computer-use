@@ -7,6 +7,7 @@
 
 - Windows 10/11（普通用户权限运行 harness/cua-driver；**管理员权限窗口不可操作**，属引擎既定边界）
 - cua-driver Windows 版已安装（官方支持：Win32 + UIA，已验证 Electron/Tauri/WPF/WinUI 3/WebView2）
+- 若 PATH 不含驱动，确认官方安装器路径 `%USERPROFILE%\\.cua-driver\\packages\\current\\cua-driver.exe` 存在；插件会自动探测该路径
 - harness-desktop（Windows 版）已装，`install.sh` 完成插件注册
 
 ## 冒烟步骤（headless，可脚本化）
@@ -26,6 +27,8 @@
    - 尝试操作管理员窗口（任务管理器/已提升的 cmd）→ 应结构化拒绝而非静默成功
    - 危险词按钮（删除/支付）→ 触发审批
    - 快照 TTL：等 16s 后操作 → 被拒
+   - PATH 不含 `cua-driver` 时仍能从 `%USERPROFILE%\\.cua-driver\\packages\\current\\cua-driver.exe` 启动
+   - `computer_key(return)` 使用 `press_key`；`computer_key(ctrl+shift+p)` 使用 `hotkey`，并验证 WinUI/XAML 行为
 
 ## 无真机时的 SSH 冒烟
 
@@ -39,3 +42,4 @@ cua-driver 官方文档 "Drive a Windows app over SSH"：
 - [ ] Windows 上 Electron 宿主（harness-desktop）内完成打开→点击→输入闭环
 - [ ] 管理员权限窗口按预期结构化拒绝
 - [ ] AX/UIA 统一抽象（screen_observe 编号 + 坐标）在 Windows 表现与 macOS 一致
+- [ ] 官方安装器路径自动发现、WinUI/XAML 组合键和普通 Win32 按键均已在真实 Windows 10/11 验证

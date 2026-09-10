@@ -24,7 +24,6 @@ const testWindow = (liveWindowList.windows || []).find((w) =>
 )
 if (!testWindow) throw new Error('verify-runtime: 当前没有可用于真实观察的可见窗口')
 const testWindowRef = String(testWindow.pid)
-const testWindowArgs = { pid: testWindow.pid, window_id: testWindow.window_id }
 console.log(`测试窗口: ${testWindow.app_name} pid=${testWindow.pid} window_id=${testWindow.window_id}`)
 
 const results = []
@@ -154,6 +153,11 @@ async function runTool(name, args, agent) {
   else {
     const ok = r.value?.ok === true && typeof r.value?.result === 'string' && r.value.result.length > 20
     check('screen_observe(ax) 真实引擎', ok, (r.value?.result ?? '').split('\n')[0]?.slice(0, 110))
+    check(
+      'ax 模式无截图时省略 image 字段',
+      r.value?.ok === true && !Object.hasOwn(r.value, 'image'),
+      JSON.stringify(r.value),
+    )
   }
 }
 
@@ -165,13 +169,37 @@ async function runTool(name, args, agent) {
   check('native 模式：text-only route 优雅拒绝', r.value?.ok === false && /image|视觉|vision/i.test(msg), msg.slice(0, 140))
 }
 
+// 2.5) 指定窗口不存在时不得回退到其他窗口
+{
+  services.llm = services.llmText
+  const r = await runTool(
+    'screen_observe',
+    { window: '__verify_runtime_window_that_does_not_exist__' },
+    agentWith('deepseek-official', 'deepseek-v4-flash'),
+  )
+  const msg = r.value?.result ?? r.error ?? ''
+  check('指定窗口不存在时拒绝自动回退', r.value?.ok === false && /未找到指定窗口/.test(msg), msg.split('\n')[0])
+}
+
 // 3) native 直读：image-capable route（真实截图 + attachments 落盘 + render 图片块）
 {
   services.llm = services.llmImage
   const r = await runTool('screen_observe', { mode: 'native', window: testWindowRef }, agentWith('deepseek-official', 'deepseek-v4-flash-vision-exp'))
   const v = r.value
-  const ok = v?.ok === true && v?.image && v.image.mediaType === 'image/png' && v.image.bytes > 0
+  const ok = v?.ok === true &&
+    typeof v.image === 'object' &&
+    typeof v.image.attachmentId === 'string' &&
+    v.image.bytes > 0 &&
+    v.image.mediaType === 'image/png'
   check('native 直读：图片块 + attachments 落盘', ok, `mode=${v?.mode} ${v?.image?.mediaType} ${v?.image?.bytes}B saved=${savedImages.length}`)
+  check(
+    'native 模式返回合法 image 对象',
+    v?.ok === true &&
+      typeof v.image === 'object' &&
+      typeof v.image.attachmentId === 'string' &&
+      v.image.bytes > 0,
+    JSON.stringify(v?.image),
+  )
   // render 必须产出图片内容块
   const def = registered.get('screen_observe')
   const blocks = def.output.render({ mode: 'native' }, v)
@@ -183,7 +211,7 @@ async function runTool(name, args, agent) {
 // 4) screen_zoom（真实引擎区域截图）
 {
   services.llm = services.llmImage
-  const r = await runTool('screen_zoom', { ...testWindowArgs, x1: 0, y1: 0, x2: 300, y2: 180 }, agentWith('deepseek-official', 'deepseek-v4-flash-vision-exp'))
+  const r = await runTool('screen_zoom', { window_id: testWindow.window_id, x1: 0, y1: 0, x2: 300, y2: 180 }, agentWith('deepseek-official', 'deepseek-v4-flash-vision-exp'))
   const v = r.value
   check('screen_zoom 区域直读', v?.ok === true && v?.image, `${v?.image?.width}x${v?.image?.height} ${v?.image?.mediaType} ${v?.image?.bytes}B`)
   const blocks = registered.get('screen_zoom').output.render({}, v)
