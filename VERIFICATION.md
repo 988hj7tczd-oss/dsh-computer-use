@@ -4,6 +4,20 @@
 > 方法：隔离 profile（.dsh-p0）headless 实测，未改动真实 GUI 配置
 > 日期：2026-08-15
 
+## 最新维护验收（main @ 7e5f9c7）
+
+以下记录针对当前 main，而不是上方的历史 0.1.1-rc.2 报告：
+
+| 项 | 结果 |
+|---|---|
+| DSH 0.1.2-rc.1 隔离宿主 | ✅ 在 `/tmp` 临时 DSH_HOME 中安装 DSH 0.1.2-rc.1 与插件 0.3.0；`--dump-config` 成功解析 `dsh-computer-use`，web profile 随机端口启动并返回 HTTP 响应，无 CallId/ToolCallId 模块链接错误 |
+| 插件 runtime 脚本 | ✅ 真实 cua-driver 0.23.2，`node verify-runtime.mjs` 15/15 通过；覆盖工具注册、AX/native/zoom、图片块和结构化拒绝 |
+| macOS GUI 闭环 | ✅ 当前插件代码 + cua-driver 0.23.2 操作系统 Calculator：AX 观察 135 个元素，点击 `1 + 2 =` 后截图确认显示 `3`，重新观察成功；`cmd+c` 路由也实际调用 |
+| Windows 真实 GUI | ⛔ 本机无 Windows 10/11 测试环境，未将逻辑测试冒充 GUI 验收 |
+| Linux 真实 GUI | ⛔ 本次未验证 |
+
+Windows/Linux 在获得对应真实桌面环境并完成 `WINDOWS_TEST.md` / 等价验收前，不得标记为 fully tested。
+
 ## P0 — 引擎与桥接验证 ✅
 
 | 项 | 结果 |
