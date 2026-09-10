@@ -75,3 +75,15 @@ test('bare Win32 key path remains press_key based', async () => {
   assert.equal(call.payload.key, 'escape')
   assert.deepEqual({ pid: call.payload.pid, window_id: call.payload.window_id }, { pid: 42, window_id: 7 })
 })
+
+test('key refuses instead of falling back to desktop scope without a snapshot', async () => {
+  let called = false
+  await assert.rejects(
+    dispatchKey({ key: 'return' }, { ttlMs: 1000 }, {
+      resolve: () => { throw new Error('没有可用的观察快照') },
+      call: async () => { called = true; return { status: 'delivered' } },
+    }),
+    /观察快照/,
+  )
+  assert.equal(called, false)
+})

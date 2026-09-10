@@ -88,7 +88,7 @@ flowchart LR
 | 滚动与拖拽 | 支持上下左右滚动和窗口本地截图坐标拖拽 |
 | 应用管理 | 列出运行中的应用，后台启动应用，按需前置窗口 |
 | 安全护栏 | 快照 TTL、应用白名单、危险操作审批、密码框保护 |
-| 跨平台 | macOS、Windows、Linux 均已完成插件测试 |
+| 跨平台 | macOS 已验证；Windows/Linux 需按真实环境完成平台验收 |
 
 ## 12 个模型工具
 
@@ -576,10 +576,10 @@ If an installer or bundle patch overrides the code-level default, the generated 
 | Platform | Status | Notes |
 |---|---|---|
 | macOS | ✅ Tested | Accessibility and Screen Recording permissions may be required |
-| Windows | ✅ Tested | Use a regular-user desktop session; elevated windows remain a system boundary |
-| Linux | ✅ Tested | Desktop environment, accessibility stack, and window manager can affect element discovery |
+| Windows | 🧪 Logic-tested | Real GUI validation requires a Windows 10/11 regular-user desktop session |
+| Linux | 🧪 Not verified here | Desktop environment, accessibility stack, and window manager can affect element discovery |
 
-All three platforms have passed plugin testing. This does not mean every application exposes an identical accessibility tree. For incomplete AX/UIA data, use `native` or `vision` and include the OS, target application, and observation output in bug reports.
+The macOS path has been verified in the project evidence. Windows and Linux still require a real platform run before they can be advertised as fully tested. This does not mean every application exposes an identical accessibility tree. For incomplete AX/UIA data, use `native` or `vision` and include the OS, target application, and observation output in bug reports.
 
 ## Troubleshooting
 
