@@ -89,7 +89,7 @@ const IMAGE_FIELD = {
 }
 
 /** render：值含 image 时追加图片块（主模型原生直读）。 */
-function renderWithImage(_args, value) {
+export function renderWithImage(_args, value) {
   if (!value.image) return [{ type: 'text', text: value.result }]
   return [
     { type: 'text', text: value.result },

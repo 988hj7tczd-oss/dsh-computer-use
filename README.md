@@ -167,6 +167,9 @@ npm install -g dsh-computer-use
 export CUA_DRIVER_BIN=/path/to/cua-driver
 ```
 
+在 Windows 官方安装器布局中，插件还会自动探测
+`%USERPROFILE%\\.cua-driver\\packages\\current\\cua-driver.exe`；GUI 宿主的 PATH 不完整时无需手工把目录加入 PATH。
+
 安装完成后重启宿主，再通过 `app_list` 或 `screen_observe` 验证工具是否出现。
 
 ## 第一个完整任务
@@ -339,7 +342,7 @@ computer_click(x=640, y=420)
 
 | 现象 | 常见原因 | 处理方式 |
 |---|---|---|
-| `cua-driver not found` | 引擎不在 PATH | 安装 cua-driver，或设置 `CUA_DRIVER_BIN` |
+| `cua-driver not found` | 引擎不在 PATH 或官方安装器路径不可用 | 安装 cua-driver，确认 `~/.cua-driver/packages/current/cua-driver.exe` 存在，或设置 `CUA_DRIVER_BIN` |
 | 没有可见窗口 | 图形会话或窗口权限不可用 | 确认目标应用正在运行并重新观察 |
 | 快照已过期 | 超过 `ttlMs` | 重新调用 `screen_observe` |
 | 元素编号点击失败 | 界面已经变化 | 重新观察后再使用新编号 |
@@ -455,6 +458,9 @@ npm install -g dsh-computer-use
 ```
 
 Make sure the host loads the bundle and that `cua-driver` is available in `PATH`, or set `CUA_DRIVER_BIN` to its absolute path.
+
+On Windows, the official installer layout is also detected automatically at
+`%USERPROFILE%\\.cua-driver\\packages\\current\\cua-driver.exe`, which covers GUI hosts whose PATH does not include the driver.
 
 ## Tools
 
@@ -579,7 +585,7 @@ All three platforms have passed plugin testing. This does not mean every applica
 
 | Symptom | Likely cause | Action |
 |---|---|---|
-| `cua-driver not found` | Driver is not in `PATH` | Install it or set `CUA_DRIVER_BIN` |
+| `cua-driver not found` | Driver is not in `PATH` or the official installer path is unavailable | Install it, confirm `~/.cua-driver/packages/current/cua-driver.exe` exists, or set `CUA_DRIVER_BIN` |
 | No visible windows | Missing graphical session or permission | Confirm the target app is visible and observe again |
 | Snapshot expired | `ttlMs` elapsed | Call `screen_observe` again |
 | Element click failed | The UI changed | Observe again and use the new index |
