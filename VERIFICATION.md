@@ -4,7 +4,7 @@
 > 方法：隔离 profile（.dsh-p0）headless 实测，未改动真实 GUI 配置
 > 日期：2026-08-15
 
-## 最新维护验收（main @ 0f487ff）
+## 最新维护验收（release candidate）
 
 以下记录针对当前 main，而不是上方的历史 0.1.1-rc.2 报告：
 
@@ -53,7 +53,7 @@ Windows/Linux 在获得对应真实桌面环境并完成 `WINDOWS_TEST.md` / 等
 
 | 护栏 | 验证方式 | 结果 |
 |---|---|---|
-| 快照 TTL | 观察后等 16s 再点击 | ✅ 拒绝："快照已过期（超过 15 秒）"，无真实操作 |
+| 快照 TTL（历史会话） | 观察后等 16s 再点击 | ✅ 当时临时 patch 为 15 秒，拒绝："快照已过期"；当前代码与 bundle patch 默认 30 秒 |
 | 无快照拒绝 | 直接动作 | ✅ 拒绝："请先调用 screen_observe" |
 | 区域限制 | allowedApps=['备忘录']，操作 harness-desktop | ✅ 拒绝："不在允许操作列表"，fail closed |
 | 放行路径 | allowedApps 含 harness-desktop | ✅ "收起侧边栏"点击成功 |
@@ -71,7 +71,7 @@ Windows/Linux 在获得对应真实桌面环境并完成 `WINDOWS_TEST.md` / 等
 7. **试用实测（真实 GUI 会话）**：`computer_key` 未传 pid/scope（press_key 报 Missing pid）→ 修复（有快照传 pid，否则 desktop scope）
 8. **试用实测**：`computer_click` 坐标模式未传 window_id（多窗口应用报 ambiguous_window_target）→ 修复（坐标模式带 window_id）
 9. **试用实测**：`computer_key` 传 pid 仍多窗口歧义 → 修复（补传 window_id；引擎验证通过 global_input/confirmed）
-10. **试用实测**：TTL 15 秒对多步 UI 操作太短（计算器 19 次点击断链）→ 配置调 60 秒（HMR 热更新生效）*（会话级临时调整；代码默认仍为 15 秒，多步操作场景可自行调大 `ttlMs`）*
+10. **试用实测（历史会话）**：TTL 15 秒对多步 UI 操作太短（计算器 19 次点击断链）→ 会话临时调 60 秒；当前代码层与 bundle patch 默认均为 30 秒，多步操作仍可显式调大 `ttlMs`。
 
 ## 🕹 真人操作模式（2026-08-15 核心改造）
 

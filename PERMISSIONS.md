@@ -13,9 +13,9 @@
 
 ## 明确不做
 
-- ❌ 不读取任何用户文件 / 项目文件（无 `fs` 读写）
-- ❌ 不发起任何网络请求（无 fetch / http / WebSocket）
-- ❌ 不访问凭据 / 环境变量中的敏感信息（仅读取 `CUA_DRIVER_BIN` 定位可执行文件）
+- ⚠️ 不读取业务用户文件 / 项目文件；仅在用户主动配置 GLM fallback 时读取 `ZHIPU_API_KEY` / `GLM_API_KEY` 或指定的 key 文件（`ZHIPU_KEY_FILE`、`~/.zhipu-key`、`~/.config/zhipu-key`），用于本次视觉请求，不写入、不输出 key
+- ⚠️ 默认不发起网络请求；仅在 GLM fallback 被选中且已配置 key 时，通过 HTTPS 请求 Z.AI GLM 视觉 API
+- ❌ 不访问 DSH/Hermes 凭据或任意业务凭据（`CUA_DRIVER_BIN` 只用于定位可执行文件；上述 GLM key 是可选的用户显式配置）
 - ❌ 不在宿主写入任何文件
 - ❌ 无 npm 生命周期脚本（install / postinstall 等一律没有；安装包内的 `install.sh` / `uninstall.sh` 是给用户手动执行的安装辅助脚本，非 npm lifecycle）
 - ❌ 不触碰真实鼠标键盘焦点（独立虚拟光标，隔离运行，不抢占用户输入）
@@ -33,8 +33,8 @@
 |---|---|---|
 | 文件权限 | ⚠️ 命中 | `spawn` 子进程（cua-driver）是核心能力，属真实插件必备，提交人工审查 |
 | 命令权限 | ⚠️ 命中 | `spawn` 仅限固定 argv 调用 `cua-driver`，非 shell（`shell: false`），无 `exec` / `eval` |
-| 网络权限 | ✅ 未命中 | 无任何网络调用 |
-| 凭据权限 | ✅ 未命中 | 不触碰 `process.env` 中的密钥/凭证（仅 `CUA_DRIVER_BIN`） |
+| 网络权限 | ⚠️ 条件命中 | 仅配置并触发 GLM fallback 时向 Z.AI GLM 视觉 API 发 HTTPS 请求 |
+| 凭据权限 | ⚠️ 条件命中 | 仅读取用户显式配置的 GLM key 来源；不读取 DSH/Hermes 凭据，不写入或输出 key |
 | 生命周期脚本 | ✅ 无 | npm 元数据中无 install/postinstall/prepare |
 
 完整安装/启动/卸载证据见 `docs/store-evidence.md`。

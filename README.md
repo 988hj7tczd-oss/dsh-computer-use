@@ -288,7 +288,7 @@ computer_click(x=640, y=420)
 4. **危险操作审批**：元素标签命中删除、支付、购买、转账、退出登录等词时请求用户确认；
 5. **密码框保护**：检测到 `AXSecureTextField` / `AXPasswordField` 时拒绝自动输入；
 6. **固定 argv 调用**：通过宿主以非 shell 方式启动 `cua-driver`；
-7. **权限边界声明**：插件本身不读取用户文件、不读取凭据、不发起普通网络请求，也没有 npm lifecycle 安装脚本。
+7. **权限边界声明**：核心桌面路径不读取业务文件或额外凭据；仅当用户配置视觉 GLM fallback 时，才读取指定 key 来源并向 GLM API 发起请求；没有 npm lifecycle 安装脚本。
 
 ### 重要限制
 
@@ -332,9 +332,9 @@ computer_click(x=640, y=420)
 
 | 平台 | 状态 | 说明 |
 |---|---|---|
-| macOS | ✅ 已测试 | 可能需要 Accessibility 和 Screen Recording 权限 |
-| Windows | ✅ 已测试 | 使用普通用户桌面会话；管理员权限窗口属于系统边界 |
-| Linux | ✅ 已测试 | 桌面环境、Accessibility 栈和窗口管理器可能影响元素识别 |
+| macOS | ✅ 已验证 | 可能需要 Accessibility 和 Screen Recording 权限 |
+| Windows | ⛔ BLOCKED | 当前无 Windows 10/11 真机；路径和按键逻辑已测试，真实 GUI 未验收 |
+| Linux | ⛔ 未验证 | 桌面环境、Accessibility 栈和窗口管理器可能影响元素识别 |
 
 测试通过不代表所有应用的界面树都完全一致。AX/UIA 不完整时，请使用 `native` 或 `vision` 模式，并在提交问题时附上操作系统、目标应用和 `screen_observe` 输出。
 
@@ -424,7 +424,7 @@ It can inspect desktop windows, expose actionable AX/UIA elements, use a screens
 - Request approval for risky semantic targets;
 - Refuse automated typing into password fields;
 - Fall back to screenshots when AX/UIA data is incomplete;
-- Tested on macOS, Windows, and Linux.
+- macOS has been verified; Windows has logic/path coverage but real GUI validation is blocked; Linux has not been verified.
 
 ## Quick Start
 
@@ -541,7 +541,7 @@ The plugin includes:
 4. **Risky-action approval**: labels such as delete, pay, purchase, transfer, or sign out can require user approval;
 5. **Password-field protection**: automated typing into password fields is refused;
 6. **Fixed non-shell driver invocation**: the host starts `cua-driver` with fixed argv;
-7. **Explicit permission boundaries**: the plugin does not read user files, credentials, or use npm lifecycle scripts.
+7. **Explicit permission boundaries**: the core desktop path does not read business files or extra credentials. The optional GLM fallback reads only its configured key source and sends an HTTPS request to the GLM vision API; there are no npm lifecycle scripts.
 
 Semantic checks are strongest for `element`-based actions. Coordinate actions and unfocused `computer_type`/`computer_key` calls cannot predict the final semantic target. `computer_key` does not validate system shortcuts. Do not give this capability to an untrusted agent, and always type passwords and secrets yourself.
 
@@ -575,9 +575,9 @@ If an installer or bundle patch overrides the code-level default, the generated 
 
 | Platform | Status | Notes |
 |---|---|---|
-| macOS | ✅ Tested | Accessibility and Screen Recording permissions may be required |
-| Windows | 🧪 Logic-tested | Real GUI validation requires a Windows 10/11 regular-user desktop session |
-| Linux | 🧪 Not verified here | Desktop environment, accessibility stack, and window manager can affect element discovery |
+| macOS | ✅ Verified | Accessibility and Screen Recording permissions may be required |
+| Windows | ⛔ Blocked | Logic/path coverage exists; real GUI validation requires a Windows 10/11 regular-user desktop session |
+| Linux | ⛔ Not verified | Desktop environment, accessibility stack, and window manager can affect element discovery |
 
 The macOS path has been verified in the project evidence. Windows and Linux still require a real platform run before they can be advertised as fully tested. This does not mean every application exposes an identical accessibility tree. For incomplete AX/UIA data, use `native` or `vision` and include the OS, target application, and observation output in bug reports.
 
