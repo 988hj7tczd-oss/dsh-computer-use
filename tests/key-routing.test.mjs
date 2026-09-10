@@ -56,6 +56,19 @@ test('structured hotkey refusal is returned as ok:false', async () => {
   assert.doesNotMatch(result.result, /按键完成/)
 })
 
+test('structured hotkey refused effect is also returned as ok:false', async () => {
+  const result = await dispatchKey({ key: 'shift+tab' }, { ttlMs: 1000 }, {
+    resolve: target,
+    call: async (tool, payload) => {
+      assert.equal(tool, 'hotkey')
+      assert.deepEqual(payload.keys, ['shift', 'tab'])
+      return { effect: 'refused', code: 'foreground_unavailable', escalation: { reason: 'target is not foreground' } }
+    },
+  })
+  assert.equal(result.ok, false)
+  assert.match(result.result, /引擎拒绝/)
+})
+
 test('bare Win32 key path remains press_key based', async () => {
   const { call } = await invoke('escape')
   assert.equal(call.tool, 'press_key')
