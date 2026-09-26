@@ -20,9 +20,11 @@
 - ❌ 无 npm 生命周期脚本（install / postinstall 等一律没有；安装包内的 `install.sh` / `uninstall.sh` 是给用户手动执行的安装辅助脚本，非 npm lifecycle）
 - ❌ 不触碰真实鼠标键盘焦点（独立虚拟光标，隔离运行，不抢占用户输入）
 
-## 依赖（仅两个，均为官方/DSH 生态）
+## 宿主依赖（仅两个，均为官方/DSH 生态）
 
-| 依赖 | 用途 |
+这两个包只声明为 `peerDependencies`，由 DSH 宿主提供并解析；插件不会把它们作为独立 runtime 副本打包进 profile。开发测试所需版本仅放在 `devDependencies` 中。
+
+| 宿主依赖 | 用途 |
 |---|---|
 | `@deepseek-ai/dsh-tools` | 注册 dsh 原生工具（`ctx.tools.register(defineTool(...))`） |
 | `@deepseek-ai/schemastery` | 工具参数 schema 定义 |
