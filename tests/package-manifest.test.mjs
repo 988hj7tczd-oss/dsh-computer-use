@@ -22,8 +22,8 @@ test('host-owned DSH packages are peers, not runtime dependencies', () => {
     )
     assert.equal(
       manifest.peerDependencies?.[packageName],
-      '*',
-      `${packageName} must be resolved from the DSH host`,
+      packageName.endsWith('dsh-tools') ? '>=0.1.2-rc.1 <0.2.0' : '>=3.18.2 <4',
+      `${packageName} must declare the tested host compatibility range`,
     )
     assert.ok(
       manifest.devDependencies?.[packageName],

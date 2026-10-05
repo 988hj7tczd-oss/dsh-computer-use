@@ -250,23 +250,31 @@ export function apply(ctx, config) {
 
   ctx.tools.register(defineTool({
     name: 'computer_type',
-    description: '文本输入：向当前焦点（或指定元素）输入一段文本。注意：不要在密码框使用——密码必须由用户本人输入（敏感输入保护）。',
+    description: '文本输入：向当前焦点（或指定元素）输入一段文本。若驱动拒绝后台投递，前台重试会先请求本次用户批准并可能切换窗口焦点。不要在密码框使用——密码必须由用户本人输入（敏感输入保护）。',
     parameters: {
       text: { type: 'string', required: true, description: '要输入的文本。' },
       element: TARGET_PARAMS.element,
     },
     output: OUT(),
-    execute: wrap('computer_type', (args, cfg2) => typeText(args, cfg2)),
+    execute: wrap('computer_type', (args, cfg2, exec) => typeText(args, cfg2, {
+      approval: ctx.approval,
+      agent: exec?.agent,
+      signal: exec?.signal,
+    })),
   }))
 
   ctx.tools.register(defineTool({
     name: 'computer_key',
-    description: '按键 / 快捷键：如 return、tab、escape、cmd+c、shift+tab。',
+    description: '按键 / 快捷键：如 return、tab、escape、cmd+c、shift+tab。若驱动拒绝后台投递，前台重试会先请求本次用户批准并可能切换窗口焦点。',
     parameters: {
       key: { type: 'string', required: true, description: '按键名或组合（示例: return / cmd+c / shift+tab / cmd+shift+p）。' },
     },
     output: OUT(),
-    execute: wrap('computer_key', (args, cfg2) => key(args, cfg2)),
+    execute: wrap('computer_key', (args, cfg2, exec) => key(args, cfg2, {
+      approval: ctx.approval,
+      agent: exec?.agent,
+      signal: exec?.signal,
+    })),
   }))
 
   ctx.tools.register(defineTool({

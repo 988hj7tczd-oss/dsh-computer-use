@@ -32,6 +32,7 @@ for (const [name, action, args, tool, label] of [
         assert.equal(calledTool, tool)
         assert.equal(payload.pid, 42)
         assert.equal(payload.window_id, 7)
+        if (tool === 'type_text') assert.equal(payload.delivery_mode, 'background')
         return { status: 'delivered' }
       },
     })
@@ -39,3 +40,43 @@ for (const [name, action, args, tool, label] of [
     assert.match(result.result, new RegExp(`${label}完成`))
   })
 }
+
+test('computer_type retries a driver-declared background failure in the foreground', async () => {
+  const calls = []
+  const result = await typeText({ text: 'hello' }, cfg, {
+    resolve: target,
+    agent: { id: 'test-agent' },
+    approval: { request: async ({ toolName, reason }) => {
+      assert.equal(toolName, 'computer_type')
+      assert.match(reason, /前台/)
+      return 'allowed-once'
+    } },
+    call: async (tool, payload) => {
+      calls.push({ tool, payload })
+      if (calls.length === 1) {
+        return { effect: 'suspected_noop', code: 'background_unavailable', escalation: { recommended: 'foreground' } }
+      }
+      return { status: 'delivered' }
+    },
+  })
+  assert.deepEqual(calls.map((call) => call.payload.delivery_mode), ['background', 'foreground'])
+  assert.deepEqual(calls.map((call) => call.tool), ['type_text', 'type_text'])
+  assert.equal(result.ok, true)
+})
+
+test('computer_type does not retry in the foreground when the user denies approval', async () => {
+  const calls = []
+  const result = await typeText({ text: 'hello' }, cfg, {
+    resolve: target,
+    agent: { id: 'test-agent' },
+    approval: { request: async () => 'denied' },
+    call: async (tool, payload) => {
+      calls.push({ tool, payload })
+      return { effect: 'suspected_noop', code: 'background_unavailable' }
+    },
+  })
+  assert.equal(calls.length, 1)
+  assert.equal(calls[0].payload.delivery_mode, 'background')
+  assert.equal(result.ok, false)
+  assert.match(result.result, /foreground_approval_denied/)
+})
