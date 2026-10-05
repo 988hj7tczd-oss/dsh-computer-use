@@ -287,8 +287,9 @@ computer_click(x=640, y=420)
 3. **应用白名单**：配置 `allowedApps` 后，只允许指定应用接受操作；
 4. **危险操作审批**：元素标签命中删除、支付、购买、转账、退出登录等词时请求用户确认；
 5. **密码框保护**：检测到 `AXSecureTextField` / `AXPasswordField` 时拒绝自动输入；
-6. **固定 argv 调用**：通过宿主以非 shell 方式启动 `cua-driver`；
-7. **权限边界声明**：核心桌面路径不读取业务文件或额外凭据；仅当用户配置视觉 GLM fallback 时，才读取指定 key 来源并向 GLM API 发起请求；没有 npm lifecycle 安装脚本。
+6. **键盘前台重试审批**：键盘/文本优先后台投递；只有驱动明确拒绝后台投递并建议前台模式、且当前工具/平台支持时，才请求用户对本次前台重试授权；未获 `allowed-once` 不切换焦点、不重试；
+7. **固定 argv 调用**：通过宿主以非 shell 方式启动 `cua-driver`；
+8. **权限边界声明**：核心桌面路径不读取业务文件或额外凭据；仅当用户配置视觉 GLM fallback 时，才读取指定 key 来源并向 GLM API 发起请求；没有 npm lifecycle 安装脚本。
 
 ### 重要限制
 
@@ -296,6 +297,7 @@ computer_click(x=640, y=420)
 
 - `x/y` 坐标模式无法提前知道目标语义，主要依赖快照 TTL 和可见操作；
 - `computer_type` 和 `computer_key` 作用于当前焦点时，无法预判最终目标内容；
+- 驱动拒绝后台键盘/文本投递时，前台重试会先请求本次用户批准；授权后可能切换目标窗口焦点；
 - `computer_key` 不会阻止 `cmd+q`、`ctrl+alt+delete` 等系统快捷键；
 - 不要把本插件的操作权限授予不可信 Agent；
 - 密码、API Key 和其他敏感信息必须由用户本人输入。
@@ -540,10 +542,13 @@ The plugin includes:
 3. **Application allowlists**: `allowedApps` can restrict the operation scope;
 4. **Risky-action approval**: labels such as delete, pay, purchase, transfer, or sign out can require user approval;
 5. **Password-field protection**: automated typing into password fields is refused;
-6. **Fixed non-shell driver invocation**: the host starts `cua-driver` with fixed argv;
-7. **Explicit permission boundaries**: the core desktop path does not read business files or extra credentials. The optional GLM fallback reads only its configured key source and sends an HTTPS request to the GLM vision API; there are no npm lifecycle scripts.
+6. **Keyboard foreground retry approval**: keyboard/text actions use background delivery first; after an explicit driver refusal and only where the driver supports the mode, foreground retry requires one-time user approval. Without approval, focus is not changed and no retry occurs;
+7. **Fixed non-shell driver invocation**: the host starts `cua-driver` with fixed argv;
+8. **Explicit permission boundaries**: the core desktop path does not read business files or extra credentials. The optional GLM fallback reads only its configured key source and sends an HTTPS request to the GLM vision API; there are no npm lifecycle scripts.
 
 Semantic checks are strongest for `element`-based actions. Coordinate actions and unfocused `computer_type`/`computer_key` calls cannot predict the final semantic target. `computer_key` does not validate system shortcuts. Do not give this capability to an untrusted agent, and always type passwords and secrets yourself.
+
+If the driver reports `background_unavailable`, the plugin asks for one-time approval before retrying in foreground mode where the current tool/platform supports it; that retry may bring the target window forward. Rejecting or lacking approval leaves the action refused.
 
 ## Configuration
 
@@ -593,6 +598,7 @@ The macOS path has been verified in the project evidence. Windows and Linux stil
 | `native` rejected | Main route is not image-capable | Switch to an image-capable model or use `vision` |
 | Vision model unavailable | Provider/model lacks image input declaration | Configure `visionProvider` / `visionModel` |
 | GLM fallback unavailable | Missing `ZHIPU_API_KEY` or rate limit | Configure the key or use a Harness vision model |
+| `background_unavailable` | Driver cannot deliver keyboard/text in the background | Approve the one-time foreground retry if changing window focus is acceptable |
 | Risky action rejected | User approval was not granted | Follow the approval result; do not bypass the guard |
 | Windows elevated window rejected | Target has a higher privilege level | Use a regular-user window |
 

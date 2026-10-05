@@ -1,6 +1,6 @@
 {
   "name": "dsh-computer-use",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Computer Use 插件：虚拟鼠标真人操作 + 原生视觉模型接入（deepseek-v4-flash-vision-exp 直读截图），screen_observe 等 12 个模型友好工具",
   "type": "module",
   "main": "index.js",
@@ -21,13 +21,13 @@
       "dsh": ">=0.1.2-rc.1"
     },
     "permissions": {
-      "summary": "通过宿主 spawn 以非 shell 固定 argv 调用 cua-driver 原生驱动本地桌面：屏幕观测（screen_observe/screen_zoom，AX 树+窗口快照）、虚拟鼠标键盘模拟（computer_click/type/key/scroll/drag/wait）、应用枚举与启动（app_list/app_launch）。内置安全护栏：危险词审批、密码框保护、过期状态拒绝、作用域权限；虚拟光标不抢占真实鼠标。核心桌面路径不读取业务文件或额外凭据；仅当 vision fallback 无可用 llm 且用户配置了 GLM key 时，读取指定 key 来源并向 GLM 视觉 API 发起 HTTPS 请求；插件不写入或输出 key。",
+      "summary": "通过宿主 spawn 以非 shell 固定 argv 调用 cua-driver 原生驱动本地桌面：屏幕观测（screen_observe/screen_zoom，AX 树+窗口快照）、虚拟鼠标键盘模拟（computer_click/type/key/scroll/drag/wait）、应用枚举与启动（app_list/app_launch）。内置安全护栏：危险词审批、密码框保护、过期状态拒绝、作用域权限；键盘/文本仅在后台投递被拒绝后请求用户单次批准再尝试前台模式，可能切换目标窗口焦点。点击使用独立虚拟光标，不移动用户真实鼠标。核心桌面路径不读取业务文件或额外凭据；仅当 vision fallback 无可用 llm 且用户配置了 GLM key 时，读取指定 key 来源并向 GLM 视觉 API 发起请求；插件不写入或输出 key。",
       "commands": [
         "cua-driver (non-shell fixed argv, resolved via CUA_DRIVER_BIN or PATH)"
       ],
       "writePaths": [],
       "externalServices": "Optional Z.AI GLM vision API over HTTPS, only for configured vision fallback",
-      "failureBoundaries": "cua-driver 缺失 → 结构化错误含自救指引；危险操作被审批拒绝 → 明确拒绝原因；观测快照过期 → 拒绝执行并提示重新观测；GLM key 未配置或请求失败 → 视觉 fallback 返回明确错误，不影响 AX/native 路径；超时 → 超时错误",
+      "failureBoundaries": "cua-driver 缺失 → 结构化错误含自救指引；危险操作或前台键盘/文本重试未获用户审批 → 明确拒绝原因且不执行重试；观测快照过期 → 拒绝执行并提示重新观测；GLM key 未配置或请求失败 → 视觉 fallback 返回明确错误，不影响 AX/native 路径；超时 → 超时错误",
       "lifecycleEvidence": "docs/store-evidence.md"
     }
   },
@@ -48,9 +48,13 @@
     "test": "node --test tests/*.test.mjs",
     "check": "node --check index.js && node --check lib/*.js && bash -n install.sh && bash -n uninstall.sh"
   },
-  "dependencies": {
+  "peerDependencies": {
+    "@deepseek-ai/dsh-tools": ">=0.1.2-rc.1 <0.2.0",
+    "@deepseek-ai/schemastery": ">=3.18.2 <4"
+  },
+  "devDependencies": {
     "@deepseek-ai/dsh-tools": "0.1.2-rc.1",
-    "@deepseek-ai/schemastery": "^3.0.0"
+    "@deepseek-ai/schemastery": "3.18.2"
   },
   "repository": {
     "type": "git",
