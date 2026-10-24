@@ -142,6 +142,16 @@ export function apply(ctx, config) {
   }
 
   /** 统一包装：先过安全护栏，再执行实现（exec 透传给需要 route 的实现）。 */
+/**
+ * 动作执行上下文：把审批服务与中止信号交给动作层，
+ * 前台投递升级（Wayland 必需）才能征询用户并随会话取消。
+ */
+const execCtx = (ctx, exec) => ({
+  approval: ctx.approval,
+  agent: exec?.agent,
+  signal: exec?.signal,
+})
+
   const wrap = (toolName, impl) => async (args, exec) => {
     try {
       const g = await guard(ctx, cfg, toolName, args, exec)
@@ -229,7 +239,7 @@ export function apply(ctx, config) {
     description: '点击：传入 screen_observe 输出的元素编号（element），或窗口截图像素坐标（x,y）。点击的是 cua-driver 的虚拟光标，不抢真实鼠标。',
     parameters: { ...TARGET_PARAMS, count: { type: 'integer', description: '可选：点击次数，默认 1。' } },
     output: OUT(),
-    execute: wrap('computer_click', (args, cfg2) => click(args, cfg2)),
+    execute: wrap('computer_click', (args, cfg2, exec) => click(args, cfg2, execCtx(ctx, exec))),
   }))
 
   ctx.tools.register(defineTool({
@@ -237,7 +247,7 @@ export function apply(ctx, config) {
     description: '双击：element 编号 或 x/y 坐标。',
     parameters: TARGET_PARAMS,
     output: OUT(),
-    execute: wrap('computer_double_click', (args, cfg2) => doubleClick(args, cfg2)),
+    execute: wrap('computer_double_click', (args, cfg2, exec) => doubleClick(args, cfg2, execCtx(ctx, exec))),
   }))
 
   ctx.tools.register(defineTool({
@@ -245,7 +255,7 @@ export function apply(ctx, config) {
     description: '右键点击：element 编号 或 x/y 坐标。',
     parameters: TARGET_PARAMS,
     output: OUT(),
-    execute: wrap('computer_right_click', (args, cfg2) => rightClick(args, cfg2)),
+    execute: wrap('computer_right_click', (args, cfg2, exec) => rightClick(args, cfg2, execCtx(ctx, exec))),
   }))
 
   ctx.tools.register(defineTool({
@@ -286,7 +296,7 @@ export function apply(ctx, config) {
       element: TARGET_PARAMS.element,
     },
     output: OUT(),
-    execute: wrap('computer_scroll', (args, cfg2) => scroll(args, cfg2)),
+    execute: wrap('computer_scroll', (args, cfg2, exec) => scroll(args, cfg2, execCtx(ctx, exec))),
   }))
 
   ctx.tools.register(defineTool({
@@ -300,7 +310,7 @@ export function apply(ctx, config) {
       duration_ms: { type: 'integer', description: '可选：拖拽耗时毫秒，默认 500。' },
     },
     output: OUT(),
-    execute: wrap('computer_drag', (args, cfg2) => drag(args, cfg2)),
+    execute: wrap('computer_drag', (args, cfg2, exec) => drag(args, cfg2, execCtx(ctx, exec))),
   }))
 
   ctx.tools.register(defineTool({
