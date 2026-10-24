@@ -266,6 +266,11 @@ native（当前路由支持图片时）
 - 不需要加屏幕坐标或窗口偏移；
 - 使用 `screen_zoom` 时，返回图片是局部区域，但点击仍应使用整窗截图坐标。
 
+> **HiDPI / 分数缩放**：驱动返回的截图帧可能是放大帧（2x、1.5x），
+> 而引擎按窗口逻辑像素解释 `x/y`。插件会读取
+> `screenshotWidth / window_bounds.width` 自动换算，模型始终只需给截图坐标。
+> 换算比例为 1 时（X11 常见情形）行为与旧版完全一致。
+
 优先使用：
 
 ```text
@@ -287,7 +292,7 @@ computer_click(x=640, y=420)
 3. **应用白名单**：配置 `allowedApps` 后，只允许指定应用接受操作；
 4. **危险操作审批**：元素标签命中删除、支付、购买、转账、退出登录等词时请求用户确认；
 5. **密码框保护**：检测到 `AXSecureTextField` / `AXPasswordField` 时拒绝自动输入；
-6. **键盘前台重试审批**：键盘/文本优先后台投递；只有驱动明确拒绝后台投递并建议前台模式、且当前工具/平台支持时，才请求用户对本次前台重试授权；未获 `allowed-once` 不切换焦点、不重试；
+6. **前台重试审批**：键盘/文本/点击/拖拽/滚动都优先后台投递；只有驱动明确拒绝后台投递并建议前台模式、且当前工具/平台支持时，才请求用户对本次前台重试授权；未获 `allowed-once` 不切换焦点、不重试；Wayland 会话没有按窗口寻址的后台注入通道，因此 Linux 上点击/拖拽/滚动需要该授权才能工作；
 7. **固定 argv 调用**：通过宿主以非 shell 方式启动 `cua-driver`；
 8. **权限边界声明**：核心桌面路径不读取业务文件或额外凭据；仅当用户配置视觉 GLM fallback 时，才读取指定 key 来源并向 GLM API 发起请求；没有 npm lifecycle 安装脚本。
 
@@ -336,7 +341,18 @@ computer_click(x=640, y=420)
 |---|---|---|
 | macOS | ✅ 已验证 | 可能需要 Accessibility 和 Screen Recording 权限 |
 | Windows | ⛔ BLOCKED | 当前无 Windows 10/11 真机；路径和按键逻辑已测试，真实 GUI 未验收 |
-| Linux | ⛔ 未验证 | 桌面环境、Accessibility 栈和窗口管理器可能影响元素识别 |
+| Linux | 🟡 部分验证 | X11 可用；Wayland 需启用驱动的 Wayland 后端 + GNOME 合成器辅助扩展，见 [docs/LINUX.md](docs/LINUX.md) |
+
+### Linux · Wayland 补充说明
+
+Linux 上「后台投递」的可用性取决于会话类型：
+
+- **X11 会话**：XTEST / XInput2 可对单个窗口投递，无需切焦点；
+- **Wayland 会话**：合成器不提供按窗口寻址的注入通道，只有 libei（作用于合成器焦点）。
+  因此 `cua-driver` 会显式返回 `background_unavailable`，插件再按审批升级到前台投递。
+
+完整的启用步骤（驱动后端开关、GNOME `winrects@cua` 辅助扩展、portal 授权）见
+[docs/LINUX.md](docs/LINUX.md)。
 
 测试通过不代表所有应用的界面树都完全一致。AX/UIA 不完整时，请使用 `native` 或 `vision` 模式，并在提交问题时附上操作系统、目标应用和 `screen_observe` 输出。
 
